@@ -1,11 +1,11 @@
-package net.kdt.pojavlaunch;
+topackage net.kdt.Koraxlaunch;
 
-import static net.kdt.pojavlaunch.Tools.currentDisplayMetrics;
-import static net.kdt.pojavlaunch.Tools.dialogForceClose;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
+import static net.kdt.KORAXLaunch.Tools.currentDisplayMetrics;
+import static net.kdt.KORAXLaunch.Tools.dialogForceClose;
+import static net.kdt.KORAXLaunch.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
+import static net.kdt.KORAXLaunch.prefs.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
+import static net.kdt.KORAXLaunch.prefs.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
+import static net.kdt.KORAXLaunch.prefs.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
 import static org.lwjgl.glfw.CallbackBridge.sendKeyPress;
 import static org.lwjgl.glfw.CallbackBridge.windowHeight;
 import static org.lwjgl.glfw.CallbackBridge.windowWidth;
@@ -45,27 +45,27 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.kdt.LoggerView;
 
-import net.kdt.pojavlaunch.customcontrols.ControlButtonMenuListener;
-import net.kdt.pojavlaunch.customcontrols.ControlData;
-import net.kdt.pojavlaunch.customcontrols.ControlDrawerData;
-import net.kdt.pojavlaunch.customcontrols.ControlJoystickData;
-import net.kdt.pojavlaunch.customcontrols.ControlLayout;
-import net.kdt.pojavlaunch.customcontrols.CustomControls;
-import net.kdt.pojavlaunch.customcontrols.EditorExitable;
-import net.kdt.pojavlaunch.customcontrols.keyboard.LwjglCharSender;
-import net.kdt.pojavlaunch.customcontrols.keyboard.TouchCharInput;
-import net.kdt.pojavlaunch.customcontrols.mouse.GyroControl;
-import net.kdt.pojavlaunch.customcontrols.mouse.HotbarView;
-import net.kdt.pojavlaunch.customcontrols.mouse.Touchpad;
-import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
-import net.kdt.pojavlaunch.prefs.QuickSettingSideDialog;
-import net.kdt.pojavlaunch.services.GameService;
-import net.kdt.pojavlaunch.utils.JREUtils;
-import net.kdt.pojavlaunch.utils.MCOptionUtils;
-import net.kdt.pojavlaunch.value.MinecraftAccount;
-import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles;
-import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
+import net.kdt.KORAXLaunch.customcontrols.ControlButtonMenuListener;
+import net.kdt.KORAXLaunch.customcontrols.ControlData;
+import net.kdt.KORAXLaunch.customcontrols.ControlDrawerData;
+import net.kdt.KORAXLaunch.customcontrols.ControlJoystickData;
+import net.kdt.KORAXLaunch.customcontrols.ControlLayout;
+import net.kdt.KORAXLaunch.customcontrols.CustomControls;
+import net.kdt.KORAXLaunch.customcontrols.EditorExitable;
+import net.kdt.KORAXLaunch.customcontrols.keyboard.LwjglCharSender;
+import net.kdt.KORAXLaunch.customcontrols.keyboard.TouchCharInput;
+import net.kdt.KORAXLaunch.customcontrols.mouse.GyroControl;
+import net.kdt.KORAXLaunch.customcontrols.mouse.HotbarView;
+import net.kdt.KORAXLaunch.customcontrols.mouse.Touchpad;
+import net.kdt.KORAXLaunch.lifecycle.ContextExecutor;
+import net.kdt.KORAXLaunch.prefs.LauncherPreferences;
+import net.kdt.KORAXLaunch.prefs.QuickSettingSideDialog;
+import net.kdt.KORAXLaunch.services.GameService;
+import net.kdt.KORAXLaunch.utils.JREUtils;
+import net.kdt.KORAXLaunch.utils.MCOptionUtils;
+import net.kdt.KORAXLaunch.value.MinecraftAccount;
+import net.kdt.KORAXLaunch.value.launcherprofiles.LauncherProfiles;
+import net.kdt.KORAXLaunch.value.launcherprofiles.MinecraftProfile;
 
 import org.lwjgl.glfw.CallbackBridge;
 
@@ -465,114 +465,4 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                 }
             } catch (Throwable th) {
                 Tools.showError(ctx, th);
-            }
-        });
-    }
-
-    @SuppressWarnings("unused") //TODO: actually use it
-    public static void openPath(String path) {
-        Context ctx = touchpad.getContext(); // no more better way to obtain a context statically
-        ((Activity)ctx).runOnUiThread(() -> {
-            try {
-                Tools.openPath(ctx, new File(path), false);
-            } catch (Throwable th) {
-                Tools.showError(ctx, th);
-            }
-        });
-    }
-
-    @Keep
-    public static void querySystemClipboard() {
-        Tools.runOnUiThread(()->{
-            ClipData clipData = GLOBAL_CLIPBOARD.getPrimaryClip();
-            if(clipData == null) {
-                AWTInputBridge.nativeClipboardReceived(null, null);
-                return;
-            }
-            ClipData.Item firstClipItem = clipData.getItemAt(0);
-            //TODO: coerce to HTML if the clip item is styled
-            CharSequence clipItemText = firstClipItem.getText();
-            if(clipItemText == null) {
-                AWTInputBridge.nativeClipboardReceived(null, null);
-                return;
-            }
-            AWTInputBridge.nativeClipboardReceived(clipItemText.toString(), "plain");
-        });
-    }
-
-    @Keep
-    public static void putClipboardData(String data, String mimeType) {
-        Tools.runOnUiThread(()-> {
-            ClipData clipData = null;
-            switch(mimeType) {
-                case "text/plain":
-                    clipData = ClipData.newPlainText("AWT Paste", data);
-                    break;
-                case "text/html":
-                    clipData = ClipData.newHtmlText("AWT Paste", data, data);
-            }
-            if(clipData != null) GLOBAL_CLIPBOARD.setPrimaryClip(clipData);
-        });
-    }
-
-    @Override
-    public void onClickedMenu() {
-        drawerLayout.openDrawer(navDrawer);
-        navDrawer.requestLayout();
-    }
-
-    @Override
-    public void exitEditor() {
-        try {
-            mControlLayout.loadLayout((CustomControls)null);
-            mControlLayout.setModifiable(false);
-            System.gc();
-            mControlLayout.loadLayout(
-                    minecraftProfile.controlFile == null
-                            ? LauncherPreferences.PREF_DEFAULTCTRL_PATH
-                            : Tools.CTRLMAP_PATH + "/" + minecraftProfile.controlFile);
-            mDrawerPullButton.setVisibility(mControlLayout.hasMenuButton() ? View.GONE : View.VISIBLE);
-        } catch (IOException e) {
-            Tools.showError(this,e);
-        }
-
-        navDrawer.setAdapter(gameActionArrayAdapter);
-        navDrawer.setOnItemClickListener(gameActionClickListener);
-        isInEditor = false;
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        GameService.LocalBinder localBinder = (GameService.LocalBinder) service;
-        mServiceBinder = localBinder;
-        minecraftGLView.start(localBinder.isActive, touchpad);
-        localBinder.isActive = true;
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-
-    }
-
-    /*
-     * Android 14 (or some devices, at least) seems to dispatch the the captured mouse events as trackball events
-     * due to a bug(?) somewhere(????)
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private boolean checkCaptureDispatchConditions(MotionEvent event) {
-        int eventSource = event.getSource();
-        // On my device, the mouse sends events as a relative mouse device.
-        // Not comparing with == here because apparently `eventSource` is a mask that can
-        // sometimes indicate multiple sources, like in the case of InputDevice.SOURCE_TOUCHPAD
-        // (which is *also* an InputDevice.SOURCE_MOUSE when controlling a cursor)
-        return (eventSource & InputDevice.SOURCE_MOUSE_RELATIVE) != 0 ||
-                (eventSource & InputDevice.SOURCE_MOUSE) != 0;
-    }
-
-    @Override
-    public boolean dispatchTrackballEvent(MotionEvent ev) {
-        if(Tools.isAndroid8OrHigher() && checkCaptureDispatchConditions(ev))
-            return minecraftGLView.dispatchCapturedPointerEvent(ev);
-        else return super.dispatchTrackballEvent(ev);
-    }
 }
